@@ -19,7 +19,7 @@ jobs:
     uses: ./.github/workflows/test.yml
 
   publish:
-    if: github.repository == 'gpac/mp4box.js'
+    if: github.repository == 'pengbins/mp4box.js'
     name: release
     needs: test
     runs-on: ubuntu-latest
