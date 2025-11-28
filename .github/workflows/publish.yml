@@ -3,7 +3,7 @@ name: Publish
 on:
   push:
     branches:
-      - main
+      - sample_time_line_layout
 
 permissions:
   contents: read

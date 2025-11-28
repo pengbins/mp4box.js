@@ -1006,7 +1006,7 @@ function buildSampleMap(start, end) {
   }
 }
 
-function verTimeline () {
+function vericalTimeline () {
   var that = this;
   var data = this.data;
   if (!data || data.length === 0) {
@@ -1099,7 +1099,7 @@ function verTimeline () {
   this.svg.attr('height', svgHeight);
 };
 
-SampleTimeline.prototype.update = verTimeline;
+SampleTimeline.prototype.update = vericalTimeline;
 
 function SampleTimeline() {
   var margin = { top: 10, right: 10, bottom: 80, left: 20 };
