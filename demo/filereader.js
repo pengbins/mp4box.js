@@ -1006,33 +1006,27 @@ function buildSampleMap(start, end) {
   }
 }
 
-SampleTimeline.prototype.update = function () {
+function verTimeline () {
   var that = this;
   var data = this.data;
   if (!data || data.length === 0) {
     return;
   }
-  var scale = data[0].duration ? 50 / data[0].duration : 50;
+  var scale = data[0].duration ? 30 / data[0].duration : 30;
   var sample_height = 30;
-  var height_spacing = 10;
+  var height_spacing = 1;
   var x_offset = 100;
   this.svg.html('');
   this.svg
     .append('text')
-    .attr('x', 0)
-    .attr('y', sample_height / 2)
+    .attr('x', x_offset)
+    .attr('y', sample_height/2)
     .text('Decoding');
-  this.svg.append('text').attr('x', 0).attr('y', sample_height).text('Timeline');
   this.svg
     .append('text')
-    .attr('x', 0)
-    .attr('y', (3 * sample_height) / 2 + height_spacing)
+    .attr('x', x_offset * 2)
+    .attr('y', sample_height/2)
     .text('Composition');
-  this.svg
-    .append('text')
-    .attr('x', 0)
-    .attr('y', 2 * sample_height + height_spacing)
-    .text('Timeline');
   this.svg
     .append('defs')
     .append('marker')
@@ -1047,48 +1041,65 @@ SampleTimeline.prototype.update = function () {
     .attr('fill', 'black');
   var dts_offset = data[0].dts;
   data.forEach(function (d, i) {
-    var sampleg = that.svg.append('g').attr('transform', 'translate(' + x_offset + ')');
+    var ypos = 50;
+
+    var sampleg = that.svg
+      .append('g')
+      .attr('transform', 'translate(' + x_offset + ',' + ypos + ')')
+      .attr("class","pair");
+
+    // Decoding Timeline
     sampleg
       .append('rect')
-      .attr('x', (d.dts - dts_offset) * scale)
-      .attr('y', 0)
-      .attr('width', d.duration * scale)
-      .attr('height', sample_height)
+      .attr('x', 0)
+      .attr('y', (d.dts - dts_offset) * scale)
+      .attr('width', 50)
+      .attr('height', d.duration * scale)
+      .attr("class","block")
       .style('fill', 'red')
       .style('stroke', d.is_sync ? 'black' : 'none');
     sampleg
       .append('text')
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('x', (d.dts - dts_offset + d.duration / 2) * scale)
-      .attr('y', sample_height / 2)
+      .attr('x', 50/ 2)
+      .attr('y', (d.dts - dts_offset + d.duration / 2) * scale )
       .text(d.dts);
+
+    // Composition Timeline
     sampleg
       .append('rect')
-      .attr('x', (d.cts - dts_offset) * scale)
-      .attr('y', sample_height + height_spacing)
-      .attr('width', d.duration * scale)
-      .attr('height', sample_height)
+      .attr('x', 50 *2)
+      .attr('y', (d.cts - dts_offset) * scale )
+      .attr('width', 50)
+      .attr('height', d.duration * scale)
+      .attr("class","block")
       .style('fill', 'blue')
       .style('stroke', d.is_sync ? 'black' : 'none');
     sampleg
       .append('text')
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('x', (d.cts - dts_offset + d.duration / 2) * scale)
-      .attr('y', sample_height + height_spacing + sample_height / 2)
+      .attr('x', 50 *2.5)
+      .attr('y', (d.cts - dts_offset + d.duration / 2) * scale)
       .text(d.cts);
+
     sampleg
       .append('line')
-      .attr('x1', (d.dts - dts_offset + d.duration / 2) * scale)
-      .attr('y1', sample_height)
-      .attr('x2', (d.cts - dts_offset + d.duration / 2) * scale)
-      .attr('y2', sample_height + height_spacing)
+      .attr('x1', 50)
+      .attr('y1', (d.dts - dts_offset + d.duration / 2) * scale)
+      .attr('x2', 50*2)
+      .attr('y2',(d.cts - dts_offset + d.duration / 2) * scale)
+      .attr("class","block")
       .attr('stroke-width', '1px')
       .attr('marker-end', 'url(#arrow)')
       .style('stroke', 'black');
   });
+  var svgHeight = data.length * (2 * sample_height + 2 * height_spacing) + 50;
+  this.svg.attr('height', svgHeight);
 };
+
+SampleTimeline.prototype.update = verTimeline;
 
 function SampleTimeline() {
   var margin = { top: 10, right: 10, bottom: 80, left: 20 };
