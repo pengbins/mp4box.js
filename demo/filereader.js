@@ -1013,48 +1013,23 @@ function vericalTimeline () {
     return;
   }
   var scale = data[0].duration ? 30 / data[0].duration : 30;
-  var sample_height = 30;
-  var height_spacing = 1;
-  var x_offset = 100;
-  this.svg.html('');
-  this.svg
-    .append('text')
-    .attr('x', x_offset)
-    .attr('y', sample_height/2)
-    .text('Decoding');
-  this.svg
-    .append('text')
-    .attr('x', x_offset * 2)
-    .attr('y', sample_height/2)
-    .text('Composition');
-  this.svg
-    .append('defs')
-    .append('marker')
-    .attr('id', 'arrow')
-    .attr('markerWidth', 13)
-    .attr('markerHeight', 13)
-    .attr('refX', 2)
-    .attr('refY', 6)
-    .attr('orient', 'auto')
-    .append('path')
-    .attr('d', 'M2,2 L2,11 L10,6 L2,2')
-    .attr('fill', 'black');
+  const sample_width = 120;
+  const content =   this.svg.select("g.content");
+  content.html('');
   var dts_offset = data[0].dts;
+  var ypos = 50;
   data.forEach(function (d, i) {
-    var ypos = 50;
-
-    var sampleg = that.svg
-      .append('g')
-      .attr('transform', 'translate(' + x_offset + ',' + ypos + ')')
-      .attr("class","pair");
-
+    var sampleg = content.append('g').attr("class","pair");
+    const dts_y = (d.dts - dts_offset) * scale + ypos;
+    const cts_y = (d.cts - dts_offset) * scale + ypos;
+    const rect_h = d.duration * scale;
+    const rect_middle =  rect_h / 2;
     // Decoding Timeline
     sampleg
       .append('rect')
-      .attr('x', 0)
-      .attr('y', (d.dts - dts_offset) * scale)
-      .attr('width', 50)
-      .attr('height', d.duration * scale)
+      .attr('y', dts_y)
+      .attr('width', sample_width)
+      .attr('height',rect_h)
       .attr("class","block")
       .style('fill', 'red')
       .style('stroke', d.is_sync ? 'black' : 'none');
@@ -1062,17 +1037,17 @@ function vericalTimeline () {
       .append('text')
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('x', 50/ 2)
-      .attr('y', (d.dts - dts_offset + d.duration / 2) * scale )
+      .attr('x', sample_width/ 2)
+      .attr('y', dts_y + rect_middle )
       .text(d.dts);
 
     // Composition Timeline
     sampleg
       .append('rect')
-      .attr('x', 50 *2)
-      .attr('y', (d.cts - dts_offset) * scale )
-      .attr('width', 50)
-      .attr('height', d.duration * scale)
+      .attr('x', sample_width *2)
+      .attr('y', cts_y)
+      .attr('width', sample_width)
+      .attr('height', rect_h)
       .attr("class","block")
       .style('fill', 'blue')
       .style('stroke', d.is_sync ? 'black' : 'none');
@@ -1080,23 +1055,21 @@ function vericalTimeline () {
       .append('text')
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
-      .attr('x', 50 *2.5)
-      .attr('y', (d.cts - dts_offset + d.duration / 2) * scale)
+      .attr('x', sample_width *2.5)
+      .attr('y', cts_y + rect_middle)
       .text(d.cts);
 
     sampleg
       .append('line')
-      .attr('x1', 50)
-      .attr('y1', (d.dts - dts_offset + d.duration / 2) * scale)
-      .attr('x2', 50*2)
-      .attr('y2',(d.cts - dts_offset + d.duration / 2) * scale)
+      .attr('x1', sample_width)
+      .attr('y1', dts_y + rect_middle)
+      .attr('x2', sample_width*2)
+      .attr('y2', cts_y + rect_middle)
       .attr("class","block")
       .attr('stroke-width', '1px')
       .attr('marker-end', 'url(#arrow)')
       .style('stroke', 'black');
   });
-  var svgHeight = data.length * (2 * sample_height + 2 * height_spacing) + 50;
-  this.svg.attr('height', svgHeight);
 };
 
 SampleTimeline.prototype.update = vericalTimeline;
@@ -1118,6 +1091,33 @@ function SampleTimeline() {
     )
     .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+  const sample_height = 30;
+  const sample_width = 120;
+  this.svg
+    .append('text')
+    .attr('x', sample_width/2)
+    .attr('y', sample_height/2)
+    .attr('text-anchor', 'middle')
+    .text('Decoding');
+  this.svg
+    .append('text')
+    .attr('x', sample_width*2.5)
+    .attr('y', sample_height/2)
+    .attr('text-anchor', 'middle')
+    .text('Composition');
+  this.svg
+    .append('defs')
+    .append('marker')
+    .attr('id', 'arrow')
+    .attr('markerWidth', 13)
+    .attr('markerHeight', 13)
+    .attr('refX', 10)
+    .attr('refY', 6)
+    .attr('orient', 'auto')
+    .append('path')
+    .attr('d', 'M2,2 L2,11 L10,6 z')
+    .attr('fill', 'black');
+  this.svg.append('g').attr("class","content");
 }
 
 SampleGraph.prototype.update = function () {
